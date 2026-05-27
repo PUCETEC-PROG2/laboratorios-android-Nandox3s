@@ -1,7 +1,7 @@
 # Laboratorio Android. Cliente de GitHub
 
 ## Datos del estudiante
-- [Josue Nicolalde]
+- Fernando Socasi
 - [PUCETEC-Desarollo de Software]
 
 ## Descripción del Proyecto
