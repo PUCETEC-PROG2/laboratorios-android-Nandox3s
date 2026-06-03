@@ -1,8 +1,6 @@
 package ec.edu.puce.githubclient.ui.screens
 
-import android.R
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,44 +19,42 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import ec.edu.puce.githubclient.models.Repository
 import ec.edu.puce.githubclient.ui.components.RepoItem
-import ec.edu.puce.githubclient.ui.theme.theme.GithubClientTheme
 import ec.edu.puce.githubclient.viewmodels.RepoListViewModel
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RepoList(
     modifier: Modifier = Modifier,
-    viewModel: RepoListViewModel = viewModel()
+    viewModel: RepoListViewModel,
+    onAddClick: () -> Unit,
+    onEditClick: (Repository) -> Unit
 ) {
     val repos by viewModel.repos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMsg by viewModel.errorMsg.collectAsState()
 
-    Scaffold (
+    Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {},
+                onClick = onAddClick,
                 shape = CircleShape,
-                containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Agregar"
                 )
-
             }
         }
     ) { innerPadding ->
         Box(
-            modifier = modifier.fillMaxSize()
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) {
             if (isLoading) {
                 CircularProgressIndicator(
@@ -77,18 +73,19 @@ fun RepoList(
             if (!isLoading && errorMsg.isNullOrBlank()) {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(count = repos.size) { i ->
-                        RepoItem(repository = repos[i])
+                        val repo = repos[i]
+                        RepoItem(
+                            repository = repo,
+                            onDeleteClick = {
+                                viewModel.deleteRepo(repo.owner.login, repo.name)
+                            },
+                            onEditClick = {
+                                onEditClick(repo)
+                            }
+                        )
                     }
                 }
             }
         }
-    }
-
-}
-@Preview(showBackground = true)
-@Composable
-fun RepoListPreview(){
-    GithubClientTheme {
-        RepoList()
     }
 }
